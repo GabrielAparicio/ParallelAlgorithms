@@ -105,20 +105,20 @@ int main(int argc,char* argv[])
 	print_vec(vec2,n_elems);
 
 	start1 = omp_get_wtime();
-  odd_even_sort1(vec1,n_elems,thread_count);
-  end1 = omp_get_wtime();
-  e1 = end1 - start1;
+  	odd_even_sort1(vec1,n_elems,thread_count);
+  	end1 = omp_get_wtime();
+  	e1 = end1 - start1;
 
-  start2 = omp_get_wtime();
-  odd_even_sort2(vec2,n_elems,thread_count);
-  end2 = omp_get_wtime();
-  e2 = end2 - start2;
+  	start2 = omp_get_wtime();
+  	odd_even_sort2(vec2,n_elems,thread_count);
+  	end2 = omp_get_wtime();
+  	e2 = end2 - start2;
 
 	print_vec(vec1,n_elems);
 	print_vec(vec2,n_elems);
 
 	printf("Method 1 - Elapsed time: %f\n",e1);
-  printf("Method 2 - Elapsed time: %f\n",e2);
+  	printf("Method 2 - Elapsed time: %f\n",e2);
 
 
 	free(input);
