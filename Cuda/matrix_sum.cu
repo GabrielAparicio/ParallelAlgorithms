@@ -19,11 +19,14 @@ __global__ void matrix_sum1(int A[], int B[], int C[], int fil, int col)
 __global__ void matrix_sum2(int A[], int B[], int C[], int fil, int col) 
 {
    int index = blockIdx.x;
-  
    int i;
-   for(i=0;i<blockDim.x;i++)
+   
+   if(index < fil)
+   {
+   for(i=0;i<col;i++)
    { 
          C[index + i] = A[index + i] + B[index + i];
+   }
    }
 }
 
@@ -32,12 +35,17 @@ __global__ void matrix_sum2(int A[], int B[], int C[], int fil, int col)
 __global__ void matrix_sum3(int A[], int B[], int C[], int fil, int col) 
 {
    int index = blockIdx.x;
-  
    int i;
-   for(i=0;i<col;i++)
+   
+   if(index<col)
    {
+      for(i=0;i<fil;i++)
+      {
          C[index*i] = A[index*i] + B[index*i];
+      }
    }
+   
+   
 } 
 
 
