@@ -5,16 +5,40 @@
 #define m 10
 #define n 5
 
-
-__global__ void matrix_sum(int A[], int B[], int C[], int fil, int col) 
+//  matrix_sum1<<<m, n>>>(d_A, d_B, d_C, m, n);
+__global__ void matrix_sum1(int A[], int B[], int C[], int fil, int col) 
 {
    
-   int my_ij = blockDim.x * blockIdx.x + threadIdx.x;
+   int index = blockDim.x * blockIdx.x + threadIdx.x;
 
    if (blockIdx.x < fil && threadIdx.x < col) 
-      C[my_ij] = A[my_ij] + B[my_ij];
+      C[index] = A[index] + B[index];
 } 
 
+// matrix_sum2<<<m, 1>>>(d_A, d_B, d_C, m, n);
+__global__ void matrix_sum2(int A[], int B[], int C[], int fil, int col) 
+{
+   int index = blockIdx.x;
+  
+   int i;
+   for(i=0;i<blockDim.x;i++)
+   { 
+         C[index + i] = A[index + i] + B[index + i];
+   }
+}
+
+
+// matrix_sum2<<<n, 1>>>(d_A, d_B, d_C, m, n);
+__global__ void matrix_sum3(int A[], int B[], int C[], int fil, int col) 
+{
+   int index = blockIdx.x;
+  
+   int i;
+   for(i=0;i<col;i++)
+   {
+         C[index*i] = A[index*i] + B[index*i];
+   }
+} 
 
 
 void fill_matrix(int A[], int fil, int col) {
@@ -65,7 +89,7 @@ int main(int argc, char* argv[]) {
    cudaMemcpy(d_A, h_A, size, cudaMemcpyHostToDevice);
    cudaMemcpy(d_B, h_B, size, cudaMemcpyHostToDevice);
 
-   matrix_sum<<<m, n>>>(d_A, d_B, d_C, m, n);
+   matrix_sum1<<<m, n>>>(d_A, d_B, d_C, m, n);
 
    cudaMemcpy(h_C, d_C, size, cudaMemcpyDeviceToHost);
 
