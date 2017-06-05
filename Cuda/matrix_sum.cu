@@ -41,7 +41,7 @@ __global__ void matrix_sum3(int A[], int B[], int C[], int fil, int col)
    {
       for(i=0;i<fil;i++)
       {
-         C[col*i + i] = A[col*i+i] + B[col*i+i];
+         C[index*col+i] = A[index*col+i] + B[index*col+i];
       }
    }
    
