@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define THREAD_PER_BLOCK 50
+#define TILE 32
+#define THREAD_PER_BLOCK TILE*TILE
 
 __global__
 void add_matrix(int* a, int* b, int* c,int n)
@@ -39,24 +40,24 @@ void mult_matrix(int* a, int* b, int* c,int n)
 __global__
 void mult_matrix_shared(int* a, int* b, int* c,int n)
 {
-	__shared__ float sub_a[THREAD_PER_BLOCK][THREAD_PER_BLOCK];
-	__shared__ float sub_b[THREAD_PER_BLOCK][THREAD_PER_BLOCK];
+	__shared__ float sub_a[TILE][TILE];
+	__shared__ float sub_b[TILE][TILE];
 
 	int bx = blockIdx.x; int by = blockIdx.y;
 	int tx = threadIdx.x; int ty = threadIdx.y;
 	
-	int Row = by * THREAD_PER_BLOCK + ty;
-	int Col = bx * THREAD_PER_BLOCK + tx;
+	int Row = by * TILE + ty;
+	int Col = bx * TILE + tx;
 
 	int Pvalue = 0;
 	
-	for (int ph = 0; ph < n/THREAD_PER_BLOCK; ++ph) {
+	for (int ph = 0; ph < n/TILE; ++ph) {
 	
-		sub_a[ty][tx] = a[Row*n + ph*THREAD_PER_BLOCK + tx];
-		sub_b[ty][tx] = b[(ph*THREAD_PER_BLOCK + ty)*n + Col];
+		sub_a[ty][tx] = a[Row*n + ph*TILE + tx];
+		sub_b[ty][tx] = b[(ph*TILE + ty)*n + Col];
 		__syncthreads();
 		
-		for (int k = 0; k < THREAD_PER_BLOCK; ++k) {
+		for (int k = 0; k < TILE; ++k) {
 			Pvalue += sub_a[ty][k] * sub_b[k][tx];
 		}
 		__syncthreads();
