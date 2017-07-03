@@ -45,8 +45,7 @@ void mult_matrix(int m1[][m_size],int m2[][m_size],int r[][m_size],int n)
 
 int main()
 {
-	
-	  int m1[m_size][m_size];
+    int m1[m_size][m_size];
     fill_matrix(m1,m_size,2);
     int m2[m_size][m_size];
     fill_matrix(m2,m_size,2);
@@ -59,5 +58,6 @@ int main()
 
     auto elapsed = chrono::duration_cast<chrono::milliseconds>(_end - _start);
     cout<<"Execution time: "<<elapsed.count()<<endl;
-	  return 0;
+    return 0;
+	
 }
