@@ -117,17 +117,18 @@ int main()
 
 	dim3 my_block(THREAD_PER_BLOCK,THREAD_PER_BLOCK);
 	dim3 my_grid((mat_elem + THREAD_PER_BLOCK-1)/my_block.x,(mat_elem + THREAD_PER_BLOCK-1)/my_block.y);
-
+	
 	//////////////////////ELAPSED TIME ///////////////////////////////
-  cudaEventRecord(my_start,0);
-  //mult_matrix<<<my_grid,my_block>>>(d_a, d_b, d_c,mat_elem);
-  mult_matrix_shared<<<my_grid,my_block>>>(d_a, d_b, d_c,mat_elem);
-  cudaEventRecord(my_stop,0);
-  cudaEventSynchronize(my_stop);
-  /////////////////////////////////////////////////////
-  
-  float elapsed_time;
-  cudaEventElapsedTime(&elapsed_time,my_start,my_stop);
+	
+	cudaEventRecord(my_start,0);
+	//mult_matrix<<<my_grid,my_block>>>(d_a, d_b, d_c,mat_elem);
+	mult_matrix_shared<<<my_grid,my_block>>>(d_a, d_b, d_c,mat_elem);
+	cudaEventRecord(my_stop,0);
+	cudaEventSynchronize(my_stop);
+	/////////////////////////////////////////////////////
+	
+	float elapsed_time;
+	cudaEventElapsedTime(&elapsed_time,my_start,my_stop);
 
 	cudaMemcpy(c,d_c,my_size,cudaMemcpyDeviceToHost);
 	
