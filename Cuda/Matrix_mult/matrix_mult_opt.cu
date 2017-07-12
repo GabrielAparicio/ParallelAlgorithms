@@ -64,7 +64,7 @@ void mult_matrix_shared(int* a, int* b, int* c,int n)
 	c[Row*n + Col] = Pvalue;
 }
 
-__global__ void  matrix_shared_opt(int *d_M, int *d_N, int *p,int N){
+__global__ void  mult_matrix_shared_opt(int *d_M, int *d_N, int *p,int N){
 	__shared__ int Mds[THREAD_PER_BLOCK][THREAD_PER_BLOCK];
 	__shared__ int Nds[THREAD_PER_BLOCK][THREAD_PER_BLOCK];
 
@@ -92,7 +92,7 @@ __global__ void  matrix_shared_opt(int *d_M, int *d_N, int *p,int N){
 	Nds[ty][tx] = prefN;
 	__syncthreads();
 	
-	for(int m = 1; m <= N/THREAD_PER_BLOCK ; ++m){				
+	for(int m = 0; m < N/THREAD_PER_BLOCK ; ++m){				
 		
 		prefM = d_M[Row*N + m*THREAD_PER_BLOCK + tx];
 		prefN = d_N[(m*THREAD_PER_BLOCK + ty)*N + Col];
@@ -144,7 +144,8 @@ void fill_mat(int* a,int n)
 	{
 		for(j=0;j<n;j++)
 		{
-			a[i*n+j] = rand()%5+1;
+			//a[i*n+j] = rand()%5+1;
+			a[i*n+j] = 1;
 		}
 	}
 }
@@ -157,9 +158,9 @@ int main()
 	int mat_elem = 8;
 	int my_size = mat_elem*mat_elem*sizeof(int);
 
-	cudaEvent_t my_start,my_stop;
-	cudaEventCreate(&my_start);
-	cudaEventCreate(&my_stop);
+	//cudaEvent_t my_start,my_stop;
+	//cudaEventCreate(&my_start);
+	//cudaEventCreate(&my_stop);
 
 	a = (int*) malloc(my_size);
 	b = (int*) malloc(my_size);
@@ -167,7 +168,13 @@ int main()
 
 	fill_mat(a,mat_elem);
 	fill_mat(b,mat_elem);
-	
+
+	printf("Matrix A\n");
+	print_matrix(a,mat_elem);
+	printf("Matrix B\n");
+	print_matrix(b,mat_elem);
+	printf("\n");
+
 	cudaMalloc((void**)&d_a,my_size);
 	cudaMalloc((void**)&d_b,my_size);
 	cudaMalloc((void**)&d_c,my_size);
@@ -180,18 +187,21 @@ int main()
 	
 	//////////////////////ELAPSED TIME ///////////////////////////////
 	
-	cudaEventRecord(my_start,0);
+	//cudaEventRecord(my_start,0);
 	//mult_matrix<<<my_grid,my_block>>>(d_a, d_b, d_c,mat_elem);
-	mult_matrix_shared<<<my_grid,my_block>>>(d_a, d_b, d_c,mat_elem);
-	cudaEventRecord(my_stop,0);
-	cudaEventSynchronize(my_stop);
+	mult_matrix_shared_opt<<<my_grid,my_block>>>(d_a, d_b, d_c,mat_elem);
+	//cudaEventRecord(my_stop,0);
+	//cudaEventSynchronize(my_stop);
 	/////////////////////////////////////////////////////
 	
-	float elapsed_time;
-	cudaEventElapsedTime(&elapsed_time,my_start,my_stop);
+	//float elapsed_time;
+	//cudaEventElapsedTime(&elapsed_time,my_start,my_stop);
 
 	cudaMemcpy(c,d_c,my_size,cudaMemcpyDeviceToHost);
-	
-	printf("Execution time: %f\n",elapsed_time);
+	printf("Matrix C\n");
+	print_matrix(c,mat_elem);	
+
+
+	//printf("Execution time: %f\n",elapsed_time);
 	return 0;
 }
